@@ -1,0 +1,9 @@
+location                  = "eastus2"
+resource_group_name       = "rg-ratecard-lakehouse-dev"
+storage_account_name      = "stlakehousedev001"
+key_vault_name            = "kv-ratecard-dev-001"
+data_factory_name         = "adf-ratecard-dev-001"
+databricks_workspace_name = "adb-ratecard-dev-001"
+github_account_name       = "shivansh-kumar"
+github_repo_name          = "work_experience_pipeline"
+
