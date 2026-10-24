@@ -17,7 +17,7 @@ variable "databricks_workspace_name" {
 
 variable "sku" {
   type    = string
-  default = "premium"
+  default = "trial"
 }
 
 resource "azurerm_databricks_workspace" "adb" {
