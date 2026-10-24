@@ -48,6 +48,7 @@ resource "azurerm_data_factory" "adf" {
       repository_name = var.github_repo_name
       branch_name     = var.github_branch_name
       root_folder     = "/ratecard_pipeline/adf"
+      git_url         = "https://github.com"
     }
   }
 
