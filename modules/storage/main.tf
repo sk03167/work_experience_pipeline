@@ -1,8 +1,19 @@
 # Storage Module: ADLS Gen2 with Hierarchical Namespace
-variable "resource_group_name" { type = string }
-variable "location" { type = string }
-variable "environment" { type = string }
-variable "storage_account_name" { type = string }
+variable "resource_group_name" {
+  type = string
+}
+
+variable "location" {
+  type = string
+}
+
+variable "environment" {
+  type = string
+}
+
+variable "storage_account_name" {
+  type = string
+}
 
 resource "azurerm_storage_account" "lakehouse" {
   name                     = var.storage_account_name
@@ -11,7 +22,7 @@ resource "azurerm_storage_account" "lakehouse" {
   account_tier             = "Standard"
   account_replication_type = var.environment == "prod" ? "GRS" : "LRS"
   account_kind             = "StorageV2"
-  is_hns_enabled           = true # Critical: Enables Azure Data Lake Storage Gen2 hierarchical namespace
+  is_hns_enabled           = true
 
   min_tls_version           = "TLS1_2"
   enable_https_traffic_only = true
@@ -22,7 +33,6 @@ resource "azurerm_storage_account" "lakehouse" {
   }
 }
 
-# Containers representing the Medallion Architecture
 resource "azurerm_storage_data_lake_gen2_filesystem" "containers" {
   for_each           = toset(["bronze", "silver", "gold", "checkpoints"])
   name               = each.key
@@ -40,4 +50,3 @@ output "storage_account_name" {
 output "primary_dfs_endpoint" {
   value = azurerm_storage_account.lakehouse.primary_dfs_endpoint
 }
-

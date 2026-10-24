@@ -1,11 +1,34 @@
 # Azure Data Factory Module with Managed Identity
-variable "resource_group_name" { type = string }
-variable "location" { type = string }
-variable "environment" { type = string }
-variable "data_factory_name" { type = string }
-variable "github_account_name" { type = string; default = "" }
-variable "github_repo_name" { type = string; default = "" }
-variable "github_branch_name" { type = string; default = "dev" }
+variable "resource_group_name" {
+  type = string
+}
+
+variable "location" {
+  type = string
+}
+
+variable "environment" {
+  type = string
+}
+
+variable "data_factory_name" {
+  type = string
+}
+
+variable "github_account_name" {
+  type    = string
+  default = ""
+}
+
+variable "github_repo_name" {
+  type    = string
+  default = ""
+}
+
+variable "github_branch_name" {
+  type    = string
+  default = "dev"
+}
 
 resource "azurerm_data_factory" "adf" {
   name                = var.data_factory_name
@@ -45,4 +68,3 @@ output "data_factory_name" {
 output "principal_id" {
   value = azurerm_data_factory.adf.identity[0].principal_id
 }
-
