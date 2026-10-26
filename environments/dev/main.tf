@@ -1,4 +1,10 @@
 terraform {
+  backend "azurerm" {
+    resource_group_name  = "rg-platform-tfstate"
+    storage_account_name = "stplatformtfstate11307"
+    container_name       = "tfstate"
+    key                  = "ratecard-dev.terraform.tfstate"
+  }
   required_version = ">= 1.5.0"
   required_providers {
     azurerm = {
@@ -61,7 +67,7 @@ module "data_factory" {
   github_branch_name  = "dev"
 }
 
-# 5. Azure Databricks Workspace (Trial SKU - 14-Day Free Evaluation)
+# 5. Azure Databricks Workspace (Trial SKU) & Access Connector
 module "databricks" {
   source                    = "../../modules/databricks"
   resource_group_name       = azurerm_resource_group.rg.name
@@ -76,7 +82,6 @@ module "databricks" {
 # ==============================================================================
 
 # Role A: ADF Managed Identity -> Key Vault Secrets User
-# Allows ADF to retrieve the Neon DB password dynamically
 resource "azurerm_role_assignment" "adf_kv_secrets_user" {
   scope                = module.key_vault.key_vault_id
   role_definition_name = "Key Vault Secrets User"
@@ -84,7 +89,6 @@ resource "azurerm_role_assignment" "adf_kv_secrets_user" {
 }
 
 # Role B: ADF Managed Identity -> Storage Blob Data Contributor on ADLS Gen2
-# Allows ADF to write Bronze staging Delta/Parquet directly to storage
 resource "azurerm_role_assignment" "adf_storage_contributor" {
   scope                = module.storage.storage_account_id
   role_definition_name = "Storage Blob Data Contributor"
@@ -92,10 +96,15 @@ resource "azurerm_role_assignment" "adf_storage_contributor" {
 }
 
 # Role C: ADF Managed Identity -> Contributor on Databricks Workspace
-# Allows ADF to orchestrate and execute notebook runs on Databricks clusters
 resource "azurerm_role_assignment" "adf_databricks_contributor" {
   scope                = module.databricks.databricks_workspace_id
   role_definition_name = "Contributor"
   principal_id         = module.data_factory.principal_id
 }
 
+# Role D: Databricks Access Connector (Unity Catalog) -> Storage Blob Data Contributor on ADLS Gen2
+resource "azurerm_role_assignment" "unity_catalog_storage_contributor" {
+  scope                = module.storage.storage_account_id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = module.databricks.access_connector_principal_id
+}
