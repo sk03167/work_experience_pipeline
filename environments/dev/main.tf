@@ -61,13 +61,14 @@ module "data_factory" {
   github_branch_name  = "dev"
 }
 
-# 5. Azure Databricks Workspace
+# 5. Azure Databricks Workspace (Trial SKU - 14-Day Free Evaluation)
 module "databricks" {
   source                    = "../../modules/databricks"
   resource_group_name       = azurerm_resource_group.rg.name
   location                  = azurerm_resource_group.rg.location
   environment               = var.environment
   databricks_workspace_name = var.databricks_workspace_name
+  sku                       = "trial"
 }
 
 # ==============================================================================

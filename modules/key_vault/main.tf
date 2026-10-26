@@ -1,9 +1,23 @@
 # Key Vault Module for Secret Management
-variable "resource_group_name" { type = string }
-variable "location" { type = string }
-variable "environment" { type = string }
-variable "key_vault_name" { type = string }
-variable "tenant_id" { type = string }
+variable "resource_group_name" {
+  type = string
+}
+
+variable "location" {
+  type = string
+}
+
+variable "environment" {
+  type = string
+}
+
+variable "key_vault_name" {
+  type = string
+}
+
+variable "tenant_id" {
+  type = string
+}
 
 resource "azurerm_key_vault" "kv" {
   name                        = var.key_vault_name
@@ -14,7 +28,7 @@ resource "azurerm_key_vault" "kv" {
   soft_delete_retention_days  = 7
   purge_protection_enabled    = false
   sku_name                    = "standard"
-  enable_rbac_authorization   = true # Modern Azure standard: RBAC instead of legacy access policies
+  enable_rbac_authorization   = true
 
   tags = {
     Environment = var.environment
@@ -33,4 +47,3 @@ output "key_vault_uri" {
 output "key_vault_name" {
   value = azurerm_key_vault.kv.name
 }
-
