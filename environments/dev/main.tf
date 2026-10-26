@@ -1,10 +1,4 @@
 terraform {
-  backend "azurerm" {
-    resource_group_name  = "rg-platform-tfstate"
-    storage_account_name = "stplatformtfstate11307"
-    container_name       = "tfstate"
-    key                  = "ratecard-dev.terraform.tfstate"
-  }
   required_version = ">= 1.5.0"
   required_providers {
     azurerm = {
