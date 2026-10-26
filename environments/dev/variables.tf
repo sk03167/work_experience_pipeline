@@ -16,13 +16,13 @@ variable "resource_group_name" {
 variable "storage_account_name" {
   type        = string
   description = "Must be globally unique, 3-24 lowercase letters/numbers"
-  default     = "stlakehousedev001"
+  default     = "stlakehousedevsk01"
 }
 
 variable "key_vault_name" {
   type        = string
   description = "Must be globally unique, 3-24 alphanumeric and hyphens"
-  default     = "kv-ratecard-dev-001"
+  default     = "kv-ratecard-dev-sk01"
 }
 
 variable "data_factory_name" {
