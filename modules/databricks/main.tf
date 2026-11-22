@@ -22,10 +22,11 @@ variable "sku" {
 
 # 1. Databricks Workspace
 resource "azurerm_databricks_workspace" "adb" {
-  name                = var.databricks_workspace_name
-  resource_group_name = var.resource_group_name
-  location            = var.location
-  sku                 = var.sku
+  name                        = var.databricks_workspace_name
+  resource_group_name         = var.resource_group_name
+  location                    = var.location
+  sku                         = var.sku
+  managed_resource_group_name = "databricks-rg-${var.databricks_workspace_name}"
 
   tags = {
     Environment = var.environment
