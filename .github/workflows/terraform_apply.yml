@@ -17,6 +17,8 @@ on:
         type: choice
         options:
           - apply
+          - recreate-all
+          - destroy-all
           - redeploy-databricks
           - destroy-databricks
       databricks_workspace_name:
@@ -69,7 +71,15 @@ jobs:
             EXTRA_ARGS="$EXTRA_ARGS -var=databricks_sku=${{ inputs.databricks_sku }}"
           fi
 
-          if [ "${{ inputs.action }}" = "destroy-databricks" ]; then
+          if [ "${{ inputs.action }}" = "destroy-all" ]; then
+            echo "Destroying ALL infrastructure in dev environment..."
+            terraform apply -destroy $EXTRA_ARGS -auto-approve
+          elif [ "${{ inputs.action }}" = "recreate-all" ]; then
+            echo "Step 1/2: Destroying ALL existing infrastructure in dev environment..."
+            terraform apply -destroy $EXTRA_ARGS -auto-approve
+            echo "Step 2/2: Recreating ALL infrastructure from scratch..."
+            terraform apply $EXTRA_ARGS -auto-approve
+          elif [ "${{ inputs.action }}" = "destroy-databricks" ]; then
             echo "Destroying expired Databricks workspace..."
             terraform apply -destroy -target=module.databricks.azurerm_databricks_workspace.adb $EXTRA_ARGS -auto-approve
           elif [ "${{ inputs.action }}" = "redeploy-databricks" ]; then
