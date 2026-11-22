@@ -30,3 +30,7 @@ output "databricks_workspace_url" {
   value = module.databricks.databricks_workspace_url
 }
 
+output "databricks_access_connector_id" {
+  value       = module.databricks.access_connector_id
+  description = "Resource ID of the Databricks Access Connector for Unity Catalog Storage Credentials"
+}

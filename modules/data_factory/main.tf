@@ -56,6 +56,14 @@ resource "azurerm_data_factory" "adf" {
     Environment = var.environment
     Project     = "ratecard-pipeline"
   }
+
+  # Prevent Terraform CI/CD runs from unlinking ADF Git integration
+  lifecycle {
+    ignore_changes = [
+      github_configuration,
+      vsts_configuration
+    ]
+  }
 }
 
 output "data_factory_id" {

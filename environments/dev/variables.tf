@@ -32,7 +32,13 @@ variable "data_factory_name" {
 
 variable "databricks_workspace_name" {
   type    = string
-  default = "adb-ratecard-dev-001"
+  default = "adb-ratecard-dev-002"
+}
+
+variable "databricks_sku" {
+  type        = string
+  description = "Databricks pricing tier / SKU (trial or premium)"
+  default     = "trial"
 }
 
 variable "github_account_name" {

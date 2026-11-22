@@ -8,6 +8,27 @@ on:
       - "environments/**"
       - "modules/**"
       - "*.tf"
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Action to execute"
+        required: true
+        default: "apply"
+        type: choice
+        options:
+          - apply
+          - recreate-all
+          - destroy-all
+          - redeploy-databricks
+          - destroy-databricks
+      databricks_workspace_name:
+        description: "Databricks workspace name override (e.g. adb-ratecard-dev-002)"
+        required: false
+        default: ""
+      databricks_sku:
+        description: "Databricks SKU override (trial or premium)"
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -40,6 +61,32 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
-      - name: Terraform Apply
-        run: terraform apply -auto-approve
+      - name: Terraform Apply / Redeploy Databricks
+        run: |
+          EXTRA_ARGS=""
+          if [ -n "${{ inputs.databricks_workspace_name }}" ]; then
+            EXTRA_ARGS="$EXTRA_ARGS -var=databricks_workspace_name=${{ inputs.databricks_workspace_name }}"
+          fi
+          if [ -n "${{ inputs.databricks_sku }}" ]; then
+            EXTRA_ARGS="$EXTRA_ARGS -var=databricks_sku=${{ inputs.databricks_sku }}"
+          fi
+
+          if [ "${{ inputs.action }}" = "destroy-all" ]; then
+            echo "Destroying ALL infrastructure in dev environment..."
+            terraform apply -destroy $EXTRA_ARGS -auto-approve
+          elif [ "${{ inputs.action }}" = "recreate-all" ]; then
+            echo "Step 1/2: Destroying ALL existing infrastructure in dev environment..."
+            terraform apply -destroy $EXTRA_ARGS -auto-approve
+            echo "Step 2/2: Recreating ALL infrastructure from scratch..."
+            terraform apply $EXTRA_ARGS -auto-approve
+          elif [ "${{ inputs.action }}" = "destroy-databricks" ]; then
+            echo "Destroying expired Databricks workspace..."
+            terraform apply -destroy -target=module.databricks.azurerm_databricks_workspace.adb $EXTRA_ARGS -auto-approve
+          elif [ "${{ inputs.action }}" = "redeploy-databricks" ]; then
+            echo "Redeploying Databricks workspace (forcing replacement of expired workspace)..."
+            terraform apply -replace=module.databricks.azurerm_databricks_workspace.adb $EXTRA_ARGS -auto-approve
+          else
+            echo "Applying Terraform configuration..."
+            terraform apply $EXTRA_ARGS -auto-approve
+          fi
 
