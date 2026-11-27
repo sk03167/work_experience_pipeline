@@ -106,3 +106,10 @@ resource "azurerm_role_assignment" "unity_catalog_storage_contributor" {
   role_definition_name = "Storage Blob Data Contributor"
   principal_id         = module.databricks.access_connector_principal_id
 }
+
+# Role E: Platform CI/CD Service Principal -> Key Vault Secrets Officer on Key Vault
+resource "azurerm_role_assignment" "cicd_kv_secrets_officer" {
+  scope                = module.key_vault.key_vault_id
+  role_definition_name = "Key Vault Secrets Officer"
+  principal_id         = data.azurerm_client_config.current.object_id
+}
