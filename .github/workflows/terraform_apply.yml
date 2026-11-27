@@ -77,6 +77,8 @@ jobs:
           elif [ "${{ inputs.action }}" = "recreate-all" ]; then
             echo "Step 1/2: Destroying ALL existing infrastructure in dev environment..."
             terraform apply -destroy $EXTRA_ARGS -auto-approve
+            echo "Waiting 45s for Azure Storage data-plane DNS to flush before recreating..."
+            sleep 45
             echo "Step 2/2: Recreating ALL infrastructure from scratch..."
             terraform apply $EXTRA_ARGS -auto-approve
           elif [ "${{ inputs.action }}" = "destroy-databricks" ]; then
@@ -86,6 +88,8 @@ jobs:
             echo "Redeploying Databricks workspace (forcing replacement of expired workspace)..."
             terraform apply -replace=module.databricks.azurerm_databricks_workspace.adb $EXTRA_ARGS -auto-approve
           else
+            echo "Untainting storage account if already provisioned in Azure..."
+            terraform untaint module.storage.azurerm_storage_account.lakehouse || true
             echo "Applying Terraform configuration..."
             terraform apply $EXTRA_ARGS -auto-approve
           fi
